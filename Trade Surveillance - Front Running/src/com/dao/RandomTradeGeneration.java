@@ -49,7 +49,7 @@ public class RandomTradeGeneration {
 		////////////////////////////////////////////////////////////////////////////////
 		
 		
-		int noOfTraders=50;
+		int noOfTraders=10;
 		int noOfBrokers = 10;
 		
 		String[] securityList = {"Call Option","Put Option","Futures","Shares"};
@@ -64,11 +64,15 @@ public class RandomTradeGeneration {
 		int[] traderIdList = new int[noOfTraders];
 		
 		
-		for(int i=0; i<noOfTraders; i++) {
-			traderNameList[i] = "Trader"+i;
-			traderIdList[i] = i;
+		for(int i=0; i<noOfTraders/2; i++) {
+			traderNameList[i] = "Firm"+(i+1);
+			traderIdList[i] = i+1;
 		}
 		
+		for(int i=0; i<noOfTraders/2; i++) {
+			traderNameList[i+noOfTraders/2] = "Customer"+(i+1);
+			traderIdList[i+noOfTraders/2] = i+1+noOfTraders/2;
+		}
 		
 		String[] brokerNameList = new String[noOfBrokers];
 		for(int i=0; i<noOfBrokers; i++) {
