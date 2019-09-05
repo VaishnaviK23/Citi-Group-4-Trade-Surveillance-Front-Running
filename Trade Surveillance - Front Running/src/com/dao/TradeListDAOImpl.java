@@ -101,6 +101,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 		// TODO Auto-generated method stub
 
 		int rows_inserted = 0;
+		
 		try {
 
 			String CREATE_TEMP = "create table temp(tradeID number PRIMARY KEY, price number(7, 2), quantity number(10), security varchar(20), tradeType varchar(10), traderID number, brokerName varchar(15), timestamp timestamp)";
@@ -135,6 +136,8 @@ public class TradeListDAOImpl implements TradeListDAO {
 			ps3.executeQuery();
 			ps7.setInt(1, tradelist.getTradeID());
 			ps7.executeQuery();
+			
+			
 
 			ps2.setInt(1, tradelist.getTradeID());
 			ps2.setDouble(2, tradelist.getPrice());
@@ -157,6 +160,10 @@ public class TradeListDAOImpl implements TradeListDAO {
 			e.printStackTrace();
 		}
 
+		
+		if (tradelist.getTrader().getTraderID()==0) {
+			rows_inserted=0;
+		}
 		return rows_inserted;
 
 	}
