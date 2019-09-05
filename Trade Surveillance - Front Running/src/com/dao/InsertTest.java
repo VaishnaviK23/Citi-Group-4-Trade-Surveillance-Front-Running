@@ -12,14 +12,14 @@ public class InsertTest {
 		
 		TradeListDAO dao = new TradeListDAOImpl();
 		
-		TradeList t1=dao.findTradeListByID(6);
+		TradeList t1=dao.findTradeListByID(10);
 		Timestamp ts=t1.getTimeStamp();
 		ts.setSeconds(ts.getSeconds()+1);
 		
-		Trader trader=new Trader(11, "adc");
+		Trader trader=new Trader(12, "abc");
 
 		
-		TradeList trade=new TradeList(7, ts, trader, "sell", "futures", 46, 74, "abc", "fb");
+		TradeList trade=new TradeList(11, ts, trader, "sell", "futures", 46, 74, "abc", "fb");
 		
 		int i=dao.insertBetween(trade);
 		System.out.println(i);

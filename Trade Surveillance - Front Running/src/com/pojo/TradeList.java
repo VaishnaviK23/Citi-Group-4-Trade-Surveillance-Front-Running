@@ -119,7 +119,7 @@ public class TradeList {
 	@Override
 	public String toString() {
 		return "TradeList [ID=" + tradeID + ", time=" + timeStamp + ", type=" + buyOrSell + ", sec=" + typeOfSecurity + ", qty=" + qty
-				+ ", price=" + price + ", broker=" + brokerName + "]";
+				+ ", price=" + price + ", broker=" + brokerName + ", traderID=" + trader.getTraderID() + "]";
 	}
 
 }

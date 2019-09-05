@@ -23,7 +23,7 @@ import com.pojo.Trader;
 
 public class TradeListDAOImpl implements TradeListDAO {
 
-	private Connection openConnection() {
+	public Connection openConnection() {
 		Connection con = null;
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -156,8 +156,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 		return null;
 	}
 
-		
-	
+			
 	public int getRecordCount() {
 		
 		TradeListDAOImpl daoImpl = new TradeListDAOImpl();
@@ -261,7 +260,25 @@ public class TradeListDAOImpl implements TradeListDAO {
 	
 	}
 
-	@Override
+//	@Override
+//
+//	public int addTradeList(TradeList tradeList) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+//
+//	@Override
+//	public TradeList findTradeListByID(int tradeListID) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public TradeList fetchBySr(int Sr, Connection conn) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+	
 	public int insertBetween(TradeList tradelist) {
 		int rows_inserted = 0;
 		try {
