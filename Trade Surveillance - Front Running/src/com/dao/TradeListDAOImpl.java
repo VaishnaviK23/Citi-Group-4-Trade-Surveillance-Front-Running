@@ -281,6 +281,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 	
 	public int insertBetween(TradeList tradelist) {
 		int rows_inserted = 0;
+		
 		try {
 
 			String CREATE_TEMP = "create table temp(tradeID number NOT NULL, traderID number, brokerName varchar(20), quantity number(38, 0),  price number(7, 2), tradeType varchar(20), securityType varchar(20), timestamp timestamp(6), company varchar(20))";
@@ -315,6 +316,8 @@ public class TradeListDAOImpl implements TradeListDAO {
 			ps3.executeQuery();
 			ps7.setInt(1, tradelist.getTradeID());
 			ps7.executeQuery();
+			
+			
 
 			ps2.setInt(1, (tradelist.getTradeID()));
 			ps2.setInt(2, tradelist.getTrader().getTraderID());
@@ -338,6 +341,10 @@ public class TradeListDAOImpl implements TradeListDAO {
 			e.printStackTrace();
 		}
 
+		
+		if (tradelist.getTrader().getTraderID()==0) {
+			rows_inserted=0;
+		}
 		return rows_inserted;
 
 	}
