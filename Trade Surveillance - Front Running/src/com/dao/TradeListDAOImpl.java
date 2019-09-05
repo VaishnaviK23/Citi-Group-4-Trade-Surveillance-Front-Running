@@ -107,7 +107,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 			String COPY_PREVIOUS = "INSERT INTO temp\r\n" + "SELECT \r\n" + "     *\r\n" + "FROM \r\n"
 					+ "     TradeList\r\n" + "WHERE \r\n" + "     tradeID between 1 and ? ";
 
-			String UPDATE = "Update TradeList set tradeID=tradeID+1 where tradeID >= ?";
+			String UPDATE = "Update TradeList set tradeID=tradeID+1, timestamp=timestamp+0.00001 where tradeID >= ?";
 
 			String INSERT_TRADER_NEW = "insert into temp values(?, ?, ?, ?, ?, ?, ?, ?)";
 
