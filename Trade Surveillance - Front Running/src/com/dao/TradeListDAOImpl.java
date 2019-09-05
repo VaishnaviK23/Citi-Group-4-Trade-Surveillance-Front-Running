@@ -17,7 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-
+import com.pojo.Student;
 import com.pojo.TradeList;
 import com.pojo.Trader;
 
@@ -40,35 +40,35 @@ public class TradeListDAOImpl implements TradeListDAO {
 		return con;
 	}
 
-//	@Override
-//	public int addTradeList(TradeList tradeList) {
-//		int rows_inserted = 0;
-//		String INSERT_TRADELIST = "insert into TradeList values(?, ?, ?, ?, ?, ?, ?, ?)";
-//		try {
-//
-//			PreparedStatement ps = openConnection().prepareStatement(INSERT_TRADELIST);
-//
-//			ps.setInt(1, (tradeList.getTradeID()));
-//			ps.setInt(2, tradeList.getTrader().getTraderID());
-//			ps.setString(3, tradeList.getBrokerName());
-//			ps.setInt(4, tradeList.getQty());
-//			ps.setFloat(5, (float) tradeList.getPrice());
-//			ps.setString(6, tradeList.getBuyOrSell());
-//			ps.setString(7, tradeList.getTypeOfSecurity());
-//			ps.setTimestamp(8, tradeList.getTimeStamp());
-//			ps.setString(9, tradeList.getCompany());
-//			
-//
-//			rows_inserted = ps.executeUpdate();
-//			System.out.println("rows: " + rows_inserted);
-//
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		return rows_inserted;
-//	}
+	@Override
+	public int addTradeList(TradeList tradeList) {
+		int rows_inserted = 0;
+		String INSERT_TRADELIST = "insert into TradeList values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		try {
+
+			PreparedStatement ps = openConnection().prepareStatement(INSERT_TRADELIST);
+
+			ps.setInt(1, (tradeList.getTradeID()));
+			ps.setInt(2, tradeList.getTrader().getTraderID());
+			ps.setString(3, tradeList.getBrokerName());
+			ps.setInt(4, tradeList.getQty());
+			ps.setFloat(5, tradeList.getPrice());
+			ps.setString(6, tradeList.getBuyOrSell());
+			ps.setString(7, tradeList.getTypeOfSecurity());
+			ps.setTimestamp(8, tradeList.getTimeStamp());
+			ps.setString(9, tradeList.getCompany());
+			
+
+			rows_inserted = ps.executeUpdate();
+			System.out.println("rows: " + rows_inserted);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return rows_inserted;
+	}
 
 	@Override
 	public TradeList findTradeListByID(int tradeID) {
@@ -391,6 +391,52 @@ public class TradeListDAOImpl implements TradeListDAO {
 		}
 
 		return tradelists;
+	}
+	
+	@Override
+	public TradeList deleteTradeList(int tradeID) {
+		// TODO Auto-generated method stub
+		TradeList tradelist = new TradeList();
+		
+		tradelist=null;
+		String TRADELIST_DELETE = "Delete from TradeList where tradeID=?";
+		String FIND_TRADELIST = "select * from Tradelist where tradeID=?";
+		try {
+			PreparedStatement ps = openConnection().prepareStatement(TRADELIST_DELETE);
+			PreparedStatement ps1 = openConnection().prepareStatement(FIND_TRADELIST);
+			ps.setInt(1, tradeID);
+			ps1.setInt(1, tradeID);
+			ResultSet set = ps1.executeQuery();
+
+			while (set.next()) {
+				
+				int traderID=set.getInt("traderID");
+				String brokerName=set.getString("brokername");
+				int quantity=set.getInt("quantity");
+				float price=set.getFloat("price");
+				String tradeType=set.getString("tradeType");
+				String security=set.getString("securityType");
+				Timestamp timestamp=set.getTimestamp("timestamp");
+				String company=set.getString("company");
+				
+				TraderDAO dao= new TraderDAOImpl();
+				Trader trader=new Trader();
+				trader=dao.findTraderByID(traderID);
+				
+
+				tradelist = new TradeList(tradeID, timestamp, trader, tradeType, security, quantity, price, brokerName, company);
+				 
+
+			}
+
+			ps.executeQuery();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return tradelist;
 	}
 
 

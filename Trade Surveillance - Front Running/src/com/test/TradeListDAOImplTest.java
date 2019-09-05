@@ -1,16 +1,19 @@
+
 package com.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.dao.TradeListDAO;
 import com.dao.TradeListDAOImpl;
-
+import com.pojo.Student;
 import com.pojo.TradeList;
 import com.pojo.Trader;
 
@@ -25,24 +28,56 @@ class TradeListDAOImplTest {
 	}
 
 	@Test
+
+	void testAddTradeList() {
+
+		TradeListDAOImpl daoImpl = new TradeListDAOImpl();
+		Trader trader = new Trader(11, "adc");
+		Date date = new Date();
+
+		long time = date.getTime();
+
+		Timestamp ts = new Timestamp(time);
+		
+		TradeList tradelist = new TradeList(10000, ts, trader, "buy", "option", 5463, 300, "abc", "FB");
+		int actual = daoImpl.addTradeList(tradelist);
+
+		assertEquals(1, actual);
+		TradeList tradelists=daoImpl.deleteTradeList(10000);
+	}
+
+	@Test
 	void testFindTradeListByID() {
-		fail("Not yet implemented");
+		TradeListDAO tradelistDAO = new TradeListDAOImpl();
+		TradeList tradelist = tradelistDAO.findTradeListByID(4);
+		assertEquals(4, tradelist.getTradeID());
+		assertEquals("abc", tradelist.getBrokerName());
+		assertEquals(46, tradelist.getQty());
+
 	}
 
 	@Test
-	void testFetchBySr() {
-		fail("Not yet implemented");
+	void testFindTradeListByID_neg() {
+		TradeListDAO tradelistDAO = new TradeListDAOImpl();
+		TradeList tradelist = tradelistDAO.findTradeListByID(1000000);
+		assertEquals(null, tradelist);
+
 	}
 
-	@Test
-	void testGetRecordCount() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testGenTrades() {
-		fail("Not yet implemented");
-	}
+//	@Test
+//	void testFetchBySr() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	void testGetRecordCount() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	void testGenTrades() {
+//		fail("Not yet implemented");
+//	}
 
 	@Test
 	void testInsertBetween() {
@@ -93,6 +128,16 @@ class TradeListDAOImplTest {
 		TradeList tradelist = tradelists.get(0);
 
 		assertEquals(1, tradelist.getTradeID());
+
+	}
+
+	@Test
+	void testDeleteTradeList() {
+		// fail("Not yet implemented");
+
+		TradeListDAO dao = new TradeListDAOImpl();
+		TradeList tradelist = dao.deleteTradeList(100000);
+		assertEquals(null, tradelist);
 
 	}
 
