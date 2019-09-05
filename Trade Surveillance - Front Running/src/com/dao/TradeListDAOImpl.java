@@ -95,4 +95,69 @@ public class TradeListDAOImpl implements TradeListDAO {
 		return tradeList;
 	}
 
+	@Override
+	public int insertBetween(TradeList tradelist) {
+		// TODO Auto-generated method stub
+
+		int rows_inserted = 0;
+		try {
+
+			String CREATE_TEMP = "create table temp(tradeID number PRIMARY KEY, price number(7, 2), quantity number(10), security varchar(20), tradeType varchar(10), traderID number, brokerName varchar(15), timestamp timestamp)";
+
+			String COPY_PREVIOUS = "INSERT INTO temp\r\n" + "SELECT \r\n" + "     *\r\n" + "FROM \r\n"
+					+ "     TradeList\r\n" + "WHERE \r\n" + "     tradeID between 1 and ? ";
+
+			String UPDATE = "Update TradeList set tradeID=tradeID+1 where tradeID >= ?";
+
+			String INSERT_TRADER_NEW = "insert into temp values(?, ?, ?, ?, ?, ?, ?, ?)";
+
+			String COPY_LATER = "INSERT INTO temp\r\n" + "SELECT \r\n" + "     *\r\n" + "FROM \r\n"
+					+ "     TradeList\r\n" + "WHERE \r\n" + "     tradeID > ? ";
+
+			String DROP = "Drop table TradeList";
+			String RENAME_TABLE = "Alter table temp RENAME to TradeList";
+			String COMMIT="commit";
+
+			PreparedStatement ps1 = openConnection().prepareStatement(CREATE_TEMP);
+			PreparedStatement ps7 = openConnection().prepareStatement(UPDATE);
+			PreparedStatement ps3 = openConnection().prepareStatement(COPY_PREVIOUS);
+			PreparedStatement ps2 = openConnection().prepareStatement(INSERT_TRADER_NEW);
+			PreparedStatement ps4 = openConnection().prepareStatement(COPY_LATER);
+			PreparedStatement ps8 = openConnection().prepareStatement(COMMIT);
+			
+
+			PreparedStatement ps5 = openConnection().prepareStatement(DROP);
+			PreparedStatement ps6 = openConnection().prepareStatement(RENAME_TABLE);
+
+			ps1.executeQuery();
+			ps3.setInt(1, tradelist.getTradeID() - 1);
+			ps3.executeQuery();
+			ps7.setInt(1, tradelist.getTradeID());
+			ps7.executeQuery();
+
+			ps2.setInt(1, tradelist.getTradeID());
+			ps2.setDouble(2, tradelist.getPrice());
+			ps2.setLong(3, tradelist.getQuantity());
+			ps2.setString(4, tradelist.getSecurity());
+			ps2.setString(5, tradelist.getTradeType());
+			ps2.setInt(6, tradelist.getTraderID());
+			ps2.setString(7, tradelist.getBrokerName());
+			ps2.setTimestamp(8, tradelist.getTimestamp());
+
+			rows_inserted = ps2.executeUpdate();
+			ps8.executeQuery();
+			ps4.setInt(1, tradelist.getTradeID());
+			ps4.executeQuery();
+			ps5.executeQuery();
+			ps6.executeQuery();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return rows_inserted;
+
+	}
+
 }
