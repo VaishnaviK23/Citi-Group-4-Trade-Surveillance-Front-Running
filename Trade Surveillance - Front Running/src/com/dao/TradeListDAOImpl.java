@@ -94,5 +94,39 @@ public class TradeListDAOImpl implements TradeListDAO {
 
 		return tradeList;
 	}
+	
+	@Override
+	public TradeList fetchBySr(int Sr, Connection conn) {
+		// TODO Auto-generated method stub
+		// return null;
+		try {
+
+			//Connection conn = getConnection();
+			String str = "select * from Excel where ID = ?";
+			PreparedStatement ps = conn.prepareStatement(str);
+			ps.setInt(1, Sr);
+			ResultSet s = ps.executeQuery();
+
+			while (s.next()) {
+
+				int tradeID = s.getInt("ID");
+				Timestamp timeStamp = s.getTimestamp("Time");
+				String buyOrSell = s.getString("Type");
+				String typeOfSecurity = s.getString("Security");
+				int qty = s.getInt("Qty");
+				int price = s.getInt("Price");
+				String brokerName = s.getString("Broker");
+				String company = s.getString("company");
+
+				TradeList TradeList = new TradeList(tradeID, timeStamp, buyOrSell, typeOfSecurity, qty, price, brokerName, company);
+				return TradeList;
+
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }
