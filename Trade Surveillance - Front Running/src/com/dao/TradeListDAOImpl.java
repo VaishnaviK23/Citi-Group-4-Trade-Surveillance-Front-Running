@@ -81,17 +81,17 @@ public class TradeListDAOImpl implements TradeListDAO {
 
 			while (set.next()) {
 
-				double price = set.getDouble("price");
-				long quantity = set.getLong("qty");
-				String security = set.getString("typeOfSecurity");
-				String tradeType = set.getString("buyOrSell");
+				float price = set.getFloat("price");
+				int quantity = set.getLong("quantity");
+				String security = set.getString("Securitytype");
+				String tradeType = set.getString("tradetype");
 				int traderID = set.getInt("traderID");
-
+				String company = set.getString("company");
 				String brokerName = set.getString("brokerName");
 				Timestamp timestamp = set.getTimestamp("timeStamp");
 
-				TradeList tradeList1 = new TradeList(tradeID, price, quantity, security, tradeType, traderID,
-						brokerName, timestamp);
+				TradeList tradeList1 = new TradeList(tradeID, timestamp, trader, price, quantity, security, tradeType, traderID,
+						brokerName);
 
 				return tradeList1;
 
@@ -112,24 +112,35 @@ public class TradeListDAOImpl implements TradeListDAO {
 		try {
 
 			//Connection conn = getConnection();
-			String str = "select * from Excel where ID = ?";
-			PreparedStatement ps = conn.prepareStatement(str);
-			ps.setInt(1, Sr);
-			ResultSet s = ps.executeQuery();
+			String str1 = "select * from TradeList where tradeID = ?";
+			PreparedStatement ps1 = conn.prepareStatement(str1);
+			ps1.setInt(1, Sr);
+			ResultSet s1 = ps1.executeQuery();
 
-			while (s.next()) {
+			while (s1.next()) {
 
-				int tradeID = s.getInt("tradeID");
-				Timestamp timeStamp = s.getTimestamp("timeStamp");
-				String buyOrSell = s.getString("buyOrSell");
-				String typeOfSecurity = s.getString("typeOfSecurity");
-				int qty = s.getInt("qty");
-				int price = s.getInt("price");
-				String brokerName = s.getString("brokerName");
-				String company = s.getString("company");
-
-				TradeList TradeList = new TradeList(tradeID, timeStamp, buyOrSell, typeOfSecurity, qty, price, brokerName, company);
-				return TradeList;
+				int tradeID = s1.getInt("tradeID");
+				Timestamp timeStamp = s1.getTimestamp("timeStamp");
+				String buyOrSell = s1.getString("tradetype");
+				String typeOfSecurity = s1.getString("securityType");
+				int qty = s1.getInt("quantity");
+				float price = s1.getFloat("price");
+				String brokerName = s1.getString("brokerName");
+				String company = s1.getString("company");
+				int traderID = s1.getInt("traderID");
+				
+				String str2 = "select * from Trader where traderID = ?";
+				PreparedStatement ps2 = conn.prepareStatement(str2);
+				ps2.setInt(1, traderID);
+				ResultSet s2 = ps2.executeQuery();
+				
+				String traderName = s2.getString("traderName");
+				
+				Trader trader = new Trader(traderID, traderName);
+				
+				
+				TradeList tradeList = new TradeList(tradeID, timeStamp, trader, buyOrSell, typeOfSecurity, qty, price, brokerName, company);
+				return tradeList;
 
 			}
 		} catch (Exception e) {
