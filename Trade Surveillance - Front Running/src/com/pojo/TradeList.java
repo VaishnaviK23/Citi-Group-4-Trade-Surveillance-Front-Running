@@ -1,4 +1,4 @@
-package com.businesslogic.scenario2;
+package com.pojo;
 
 import java.sql.Timestamp;
 
