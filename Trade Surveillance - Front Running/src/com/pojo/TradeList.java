@@ -104,12 +104,7 @@ public class TradeList {
 	public float getPrice() {
 		return price;
 	}
-
-	public void setPrice(int price) {
-		this.price = price;
-	}
-
-
+	
 	@Override
 	public String toString() {
 		return "TradeList [ID=" + tradeID + ", time=" + timeStamp + ", type=" + buyOrSell + ", sec=" + typeOfSecurity + ", qty=" + qty
