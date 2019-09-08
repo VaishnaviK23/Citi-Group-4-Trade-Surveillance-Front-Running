@@ -39,12 +39,12 @@ public class TradeListDAOImpl implements TradeListDAO {
 
 			ps.setInt(1, tradeList.getTradeID());
 			ps.setDouble(2, tradeList.getPrice());
-			ps.setLong(3, tradeList.getQuantity());
-			ps.setString(4, tradeList.getSecurity());
-			ps.setString(5, tradeList.getTradeType());
+			ps.setLong(3, tradeList.getQty());
+			ps.setString(4, tradeList.getTypeOfSecurity());
+			ps.setString(5, tradeList.getBuyOfSell());
 			ps.setInt(6, tradeList.getTradeID());
 			ps.setString(7, tradeList.getBrokerName());
-			ps.setTimestamp(8, tradeList.getTimestamp());
+			ps.setTimestamp(8, tradeList.getTimeStamp());
 
 			rows_inserted = ps.executeUpdate();
 			System.out.println("rows: " + rows_inserted);
@@ -72,13 +72,13 @@ public class TradeListDAOImpl implements TradeListDAO {
 			while (set.next()) {
 
 				double price = set.getDouble("price");
-				long quantity = set.getLong("quantity");
-				String security = set.getString("security");
-				String tradeType = set.getString("tradeType");
+				long quantity = set.getLong("qty");
+				String security = set.getString("typeOfSecurity");
+				String tradeType = set.getString("buyOrSell");
 				int traderID = set.getInt("traderID");
 
 				String brokerName = set.getString("brokerName");
-				Timestamp timestamp = set.getTimestamp("timestamp");
+				Timestamp timestamp = set.getTimestamp("timeStamp");
 
 				TradeList tradeList1 = new TradeList(tradeID, price, quantity, security, tradeType, traderID,
 						brokerName, timestamp);
@@ -109,13 +109,13 @@ public class TradeListDAOImpl implements TradeListDAO {
 
 			while (s.next()) {
 
-				int tradeID = s.getInt("ID");
-				Timestamp timeStamp = s.getTimestamp("Time");
-				String buyOrSell = s.getString("Type");
-				String typeOfSecurity = s.getString("Security");
-				int qty = s.getInt("Qty");
-				int price = s.getInt("Price");
-				String brokerName = s.getString("Broker");
+				int tradeID = s.getInt("tradeID");
+				Timestamp timeStamp = s.getTimestamp("timeStamp");
+				String buyOrSell = s.getString("buyOrSell");
+				String typeOfSecurity = s.getString("typeOfSecurity");
+				int qty = s.getInt("qty");
+				int price = s.getInt("price");
+				String brokerName = s.getString("brokerName");
 				String company = s.getString("company");
 
 				TradeList TradeList = new TradeList(tradeID, timeStamp, buyOrSell, typeOfSecurity, qty, price, brokerName, company);
