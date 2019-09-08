@@ -79,7 +79,7 @@ public class TradeList {
 		this.company = company;
 	}
 
-	public TradeList(int iD, Timestamp time, Trader trader, String type, String sec, int qty, int price, String bro, String company) {
+	public TradeList(int iD, Timestamp time, Trader trader, String type, String sec, int qty, float price, String bro, String company) {
 		tradeID = iD;
 		this.timeStamp = time;
 		this.buyOrSell = type;
@@ -88,8 +88,7 @@ public class TradeList {
 		this.price = price;
 		this.brokerName = bro;
 		this.company = company;
-		this.trader.setTraderID(trader.getTraderID());
-		this.trader.setTraderName(trader.getTraderName());
+		this.trader = trader;
 	}
 
 
