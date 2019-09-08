@@ -2,6 +2,8 @@ package com.pojo;
 
 import java.sql.Timestamp;
 
+import com.pojo.Trader;
+
 public class TradeList {
 	int tradeID;
 	Timestamp timeStamp;
@@ -10,7 +12,24 @@ public class TradeList {
 	int qty;
 	float price;
 	String brokerName;
-	int traderID;
+	Trader trader;
+	String company;
+	
+	public Trader getTrader() {
+		return trader;
+	}
+
+	public void setTrader(Trader trader) {
+		this.trader = trader;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
+
+	
+	
 	public int getTradeID() {
 		return tradeID;
 	}
@@ -51,16 +70,7 @@ public class TradeList {
 		this.brokerName = brokerName;
 	}
 
-	public int getTraderID() {
-		return traderID;
-	}
-
-	public void setTraderID(int traderID) {
-		this.traderID = traderID;
-	}
-
-	String company;
-
+	
 	public String getCompany() {
 		return company;
 	}
@@ -69,7 +79,7 @@ public class TradeList {
 		this.company = company;
 	}
 
-	public TradeList(int iD, Timestamp time, String type, String sec, int qty, int price, String bro, String company) {
+	public TradeList(int iD, Timestamp time, Trader trader, String type, String sec, int qty, int price, String bro, String company) {
 		tradeID = iD;
 		this.timeStamp = time;
 		this.buyOrSell = type;
@@ -78,6 +88,8 @@ public class TradeList {
 		this.price = price;
 		this.brokerName = bro;
 		this.company = company;
+		this.trader.setTraderID(trader.getTraderID());
+		this.trader.setTraderName(trader.getTraderName());
 	}
 
 
@@ -100,7 +112,7 @@ public class TradeList {
 
 	@Override
 	public String toString() {
-		return "TradeList [ID=" + tradeID + ", time=" + timeStamp + ", type=" + buyOrSell + ", sec=" + typeOfSecurity + ", quantity=" + qty
+		return "TradeList [ID=" + tradeID + ", time=" + timeStamp + ", type=" + buyOrSell + ", sec=" + typeOfSecurity + ", qty=" + qty
 				+ ", price=" + price + ", broker=" + brokerName + "]";
 	}
 
