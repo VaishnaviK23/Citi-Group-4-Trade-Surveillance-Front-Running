@@ -1,18 +1,16 @@
-package com.pojo;
+package com.businesslogic.scenario2;
 
 import java.sql.Timestamp;
 
 public class TradeList {
-
-	private int tradeID;
-	private double price;
-	private long quantity;
-	private String security;
-	private String tradeType;
-	private int traderID;
-	private String brokerName;
-	private Timestamp timestamp;
-
+	int tradeID;
+	Timestamp timeStamp;
+	String buyOrSell;
+	String typeOfSecurity;
+	int qty;
+	float price;
+	String brokerName;
+	int traderID;
 	public int getTradeID() {
 		return tradeID;
 	}
@@ -21,44 +19,28 @@ public class TradeList {
 		this.tradeID = tradeID;
 	}
 
-	public double getPrice() {
-		return price;
+	public Timestamp getTimeStamp() {
+		return timeStamp;
 	}
 
-	public void setPrice(double price) {
-		this.price = price;
+	public void setTimeStamp(Timestamp timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
-	public long getQuantity() {
-		return quantity;
+	public String getBuyOrSell() {
+		return buyOrSell;
 	}
 
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
+	public void setBuyOrSell(String buyOrSell) {
+		this.buyOrSell = buyOrSell;
 	}
 
-	public String getSecurity() {
-		return security;
+	public String getTypeOfSecurity() {
+		return typeOfSecurity;
 	}
 
-	public void setSecurity(String security) {
-		this.security = security;
-	}
-
-	public String getTradeType() {
-		return tradeType;
-	}
-
-	public void setTradeType(String tradeType) {
-		this.tradeType = tradeType;
-	}
-
-	public int getTraderID() {
-		return traderID;
-	}
-
-	public void setTraderID(int traderID) {
-		this.traderID = traderID;
+	public void setTypeOfSecurity(String typeOfSecurity) {
+		this.typeOfSecurity = typeOfSecurity;
 	}
 
 	public String getBrokerName() {
@@ -69,36 +51,57 @@ public class TradeList {
 		this.brokerName = brokerName;
 	}
 
-	public Timestamp getTimestamp() {
-		return timestamp;
+	public int getTraderID() {
+		return traderID;
 	}
 
-	public void setTimestamp(Timestamp timestamp) {
-		this.timestamp = timestamp;
+	public void setTraderID(int traderID) {
+		this.traderID = traderID;
 	}
+
+	String company;
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public TradeList(int iD, Timestamp time, String type, String sec, int qty, int price, String bro, String company) {
+		tradeID = iD;
+		this.timeStamp = time;
+		this.buyOrSell = type;
+		this.typeOfSecurity = sec;
+		this.qty = qty;
+		this.price = price;
+		this.brokerName = bro;
+		this.company = company;
+	}
+
+
+	public int getQty() {
+		return qty;
+	}
+
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+
 
 	@Override
 	public String toString() {
-		return "TradeList [tradeID=" + tradeID + ", price=" + price + ", quantity=" + quantity + ", security="
-				+ security + ", tradeType=" + tradeType + ", traderID=" + traderID + ", brokerName=" + brokerName
-				+ ", timestamp=" + timestamp + "]";
-	}
-
-	public TradeList(int tradeID, double price, long quantity, String security, String tradeType, int traderID,
-			String brokerName, Timestamp timestamp) {
-		super();
-		this.tradeID = tradeID;
-		this.price = price;
-		this.quantity = quantity;
-		this.security = security;
-		this.tradeType = tradeType;
-		this.traderID = traderID;
-		this.brokerName = brokerName;
-		this.timestamp = timestamp;
-	}
-
-	public TradeList() {
-		// TODO Auto-generated constructor stub
+		return "TradeList [ID=" + tradeID + ", time=" + timeStamp + ", type=" + buyOrSell + ", sec=" + typeOfSecurity + ", quantity=" + qty
+				+ ", price=" + price + ", broker=" + brokerName + "]";
 	}
 
 }
