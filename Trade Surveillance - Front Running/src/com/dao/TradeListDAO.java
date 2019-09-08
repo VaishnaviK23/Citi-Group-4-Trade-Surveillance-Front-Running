@@ -5,8 +5,9 @@ import com.pojo.TradeList;
 
 public interface TradeListDAO {
 	
-	int addTradeList(TradeList tradeList);
-	TradeList findTradeListByID(int tradeListID);
-	TradeList fetchBySr(int Sr, Connection conn);
+	public int addTradeList(TradeList tradeList);
+	public TradeList findTradeListByID(int tradeListID);
+	public TradeList fetchBySr(int Sr, Connection conn);
+	public void genTrades(int genTradeQuantity)
 
 }
