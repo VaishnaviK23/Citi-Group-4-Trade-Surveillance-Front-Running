@@ -12,7 +12,7 @@ public interface TradeListDAO {
 	//public int addTradeList(TradeList tradeList);
 	public TradeList findTradeListByID(int tradeListID);
 	public TradeList fetchBySr(int Sr, Connection conn);
-	public void genTrades(int genTradeQuantity);
+	public int genTrades(int genTradeQuantity);
 	int insertBetween(TradeList tradelist);
 	List<TradeList> display();
 	

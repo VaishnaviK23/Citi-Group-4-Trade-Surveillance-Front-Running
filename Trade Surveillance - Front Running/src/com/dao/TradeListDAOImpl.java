@@ -194,7 +194,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 	
 	
 	@Override
-	public void genTrades(int genTradeQuantity) {
+	public int genTrades(int genTradeQuantity) {
 		// TODO Auto-generated method stub
 		
 		int rows_inserted = 0;
@@ -245,6 +245,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 				
 				//System.out.println(trade);
 				ps.executeUpdate();
+				rows_inserted++;
 				//set.afterLast();
 				
 				
@@ -270,6 +271,8 @@ public class TradeListDAOImpl implements TradeListDAO {
 			}
 			
 		}
+		
+		return rows_inserted;
 	
 	}
 
