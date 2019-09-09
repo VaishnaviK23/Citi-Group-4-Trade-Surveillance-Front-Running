@@ -249,6 +249,19 @@ public class TradeListDAOImpl implements TradeListDAO {
 				//set.afterLast();
 				
 				
+				////////////////////////////////////////////////////////////////////////////////////////////
+				
+				//String INSERT_TRADER = "INSERT /*+ APPEND */ into traderlist2 values(?,?)";
+				//PreparedStatement ps2 = con.prepareStatement(INSERT_TRADER);
+				//ps2.setInt(1,trader.getTraderID());
+				//ps2.setString(2,trader.getTraderName());
+				
+				//ps2.executeUpdate();
+				/////////////////////////////////////////////////////////////////////////////////////////////
+				
+				
+				
+				
 				//System.out.println("rows: "+rows_inserted);
 				
 				
