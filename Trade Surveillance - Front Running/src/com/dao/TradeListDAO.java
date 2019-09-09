@@ -1,6 +1,7 @@
 package com.dao;
 
 import java.sql.Connection;
+
 import java.util.List;
 
 import com.pojo.TradeList;
@@ -15,5 +16,4 @@ public interface TradeListDAO {
 	int insertBetween(TradeList tradelist);
 	List<TradeList> display();
 	
-
 }
