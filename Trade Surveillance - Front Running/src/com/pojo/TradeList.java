@@ -15,6 +15,8 @@ public class TradeList {
 	Trader trader;
 	String company;
 	
+	
+	
 	public Trader getTrader() {
 		return trader;
 	}
@@ -27,7 +29,17 @@ public class TradeList {
 		this.price = price;
 	}
 
-
+	public TradeList() {
+		this.tradeID = 0;
+		this.trader = null;
+		this.brokerName = null;
+		this.buyOrSell = null;
+		this.company = null;
+		this.price = 0;
+		this.qty = 0;
+		this.timeStamp = null;
+		this.typeOfSecurity = null;
+	}
 	
 	
 	public int getTradeID() {
