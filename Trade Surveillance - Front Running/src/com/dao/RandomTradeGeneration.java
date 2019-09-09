@@ -1,4 +1,6 @@
-package com.tradelist;
+package com.dao;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import com.pojo.TradeList;
+import com.pojo.Trader;
 
 public class RandomTradeGeneration {
 	
