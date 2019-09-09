@@ -22,11 +22,8 @@ public class GenerateHashMap {
 			this.databaseSize = 8;
 			System.out.println("Database Size: "+this.databaseSize);
 			//updating the future HashMap
-//			HashMap<Integer, Integer> firstTrader = new HashMap<Integer, Integer>();
-//			firstTrader.put(trades.get(0).getTrader().getTraderID(), trades.get(0).getQty());
-//			past.put(generateKey(trades.get(0)), firstTrader);
-//			
-			for(int i=0;i<interval;i++) {
+
+			for(int i=1;i<=interval;i++) {
 				//String key = trades.get(i).getCompany() + ";" + trades.get(i).getBuyOrSell();
 				//Add the incoming trade to HashMap
 				
@@ -71,6 +68,7 @@ public class GenerateHashMap {
 					}
 					
 			}
+			System.out.println(this.future);
 	}
 	
 	public void parseDatabase(ArrayList<TradeList> allTrades, HashMap<String, HashMap<Integer,Integer>> past, HashMap<String, HashMap<Integer, Integer>> future) {
@@ -82,11 +80,9 @@ public class GenerateHashMap {
 		int futureEnd = this.databaseSize>interval? interval+1 : this.databaseSize; // if database size less than 60 then futureEnd will point to the last element in the database
 		int pastDataSize = 1;
 		int futureDataSize = interval;
-		System.out.println(this.past);
 		// start from 1 as the trade 0 is added in the "past" hash table 
 		for(int i=0; i<this.databaseSize; i++)
 		{
-			System.out.println(i);
 			TradeList trade = allTrades.get(i);
 			String key = generateKey(trade);
 			
@@ -145,10 +141,14 @@ public class GenerateHashMap {
 				
 			}
 			
-			System.out.println("---------------Past Data-----------------");
-			System.out.println(this.past);
+//			System.out.println("---------------Past Data-----------------");
+//			System.out.println(this.past);
+			
+			// Add into futures HashTable
+			
+			
 		}
-		
+
 	}
 	
 	private void addIntoHashTable(HashMap<String, HashMap<Integer, Integer>> hashTable, TradeList tradeList) {
