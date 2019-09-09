@@ -21,6 +21,7 @@ import com.pojo.Trader;
 @Path("/check")
 class Test {
 
+	@SuppressWarnings("deprecation")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -52,13 +53,22 @@ class Test {
 		String tradeType = tradeType_ui;
 		String company = company_ui;
 		String securityType = securityType_ui;
+		
+		TradeList t1=dao.findTradeListByID(tradeID-1);
+		Timestamp ts=t1.getTimeStamp();
+		ts.setSeconds(ts.getSeconds()+1);
+		
 
-		Date date = new Date();
-
-		long time = date.getTime();
-
-		Timestamp ts = new Timestamp(time);
-		System.out.println(ts);
+//		Date date = new Date();
+//
+//		long time = date.getTime();
+//
+//		Timestamp ts = new Timestamp(time);
+//		System.out.println(ts);
+		
+		
+		
+		
 
 		TradeList tradelist = new TradeList(tradeID, ts, trader1, tradeType, securityType, quantity, price, brokerName,
 				company);
