@@ -40,35 +40,35 @@ public class TradeListDAOImpl implements TradeListDAO {
 		return con;
 	}
 
-	@Override
-	public int addTradeList(TradeList tradeList) {
-		int rows_inserted = 0;
-		String INSERT_TRADELIST = "insert into TradeList values(?, ?, ?, ?, ?, ?, ?, ?)";
-		try {
-
-			PreparedStatement ps = openConnection().prepareStatement(INSERT_TRADELIST);
-
-			ps.setInt(1, (tradeList.getTradeID()));
-			ps.setInt(2, tradeList.getTrader().getTraderID());
-			ps.setString(3, tradeList.getBrokerName());
-			ps.setInt(4, tradeList.getQty());
-			ps.setFloat(5, (float) tradeList.getPrice());
-			ps.setString(6, tradeList.getBuyOrSell());
-			ps.setString(7, tradeList.getTypeOfSecurity());
-			ps.setTimestamp(8, tradeList.getTimeStamp());
-			ps.setString(9, tradeList.getCompany());
-			
-
-			rows_inserted = ps.executeUpdate();
-			System.out.println("rows: " + rows_inserted);
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return rows_inserted;
-	}
+//	@Override
+//	public int addTradeList(TradeList tradeList) {
+//		int rows_inserted = 0;
+//		String INSERT_TRADELIST = "insert into TradeList values(?, ?, ?, ?, ?, ?, ?, ?)";
+//		try {
+//
+//			PreparedStatement ps = openConnection().prepareStatement(INSERT_TRADELIST);
+//
+//			ps.setInt(1, (tradeList.getTradeID()));
+//			ps.setInt(2, tradeList.getTrader().getTraderID());
+//			ps.setString(3, tradeList.getBrokerName());
+//			ps.setInt(4, tradeList.getQty());
+//			ps.setFloat(5, (float) tradeList.getPrice());
+//			ps.setString(6, tradeList.getBuyOrSell());
+//			ps.setString(7, tradeList.getTypeOfSecurity());
+//			ps.setTimestamp(8, tradeList.getTimeStamp());
+//			ps.setString(9, tradeList.getCompany());
+//			
+//
+//			rows_inserted = ps.executeUpdate();
+//			System.out.println("rows: " + rows_inserted);
+//
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		return rows_inserted;
+//	}
 
 	@Override
 	public TradeList findTradeListByID(int tradeID) {
@@ -260,24 +260,24 @@ public class TradeListDAOImpl implements TradeListDAO {
 	
 	}
 
-	@Override
-
-	public int addTradeList(TradeList tradeList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public TradeList findTradeListByID(int tradeListID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public TradeList fetchBySr(int Sr, Connection conn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//
+//	public int addTradeList(TradeList tradeList) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+//
+//	@Override
+//	public TradeList findTradeListByID(int tradeListID) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public TradeList fetchBySr(int Sr, Connection conn) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
 	public int insertBetween(TradeList tradelist) {
 		int rows_inserted = 0;
@@ -288,7 +288,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 			String COPY_PREVIOUS = "INSERT INTO temp\r\n" + "SELECT \r\n" + "     *\r\n" + "FROM \r\n"
 					+ "     TradeList\r\n" + "WHERE \r\n" + "     tradeID between 1 and ? ";
 
-			String UPDATE = "Update TradeList set tradeID=tradeID+1 where tradeID >= ?";
+			String UPDATE = "Update TradeList set tradeID=tradeID+1, timestamp=timestamp+0.00001 where tradeID >= ?";
 
 			String INSERT_TRADER_NEW = "insert into temp values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
