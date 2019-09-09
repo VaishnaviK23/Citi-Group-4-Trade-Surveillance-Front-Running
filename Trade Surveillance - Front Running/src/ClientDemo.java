@@ -1,7 +1,3 @@
-
-
-
-
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -17,7 +13,7 @@ public class ClientDemo {
 		// TODO Auto-generated method stub
 		TradeListDAOImpl obj = new TradeListDAOImpl();
 		LinkedList<TradeList> tradeList = new LinkedList<TradeList>();
-		Connection conn = obj.getConnection();
+		Connection conn = obj.openConnection();
 		FrontRunningDetectionList detect = new FrontRunningDetectionList();
 		
 		for (int i = 1; i <= 203; i++) {
