@@ -77,12 +77,13 @@ public class GenerateHashMap {
 		int pastStart = 0;
 		int pastEnd = 0;
 		int futureStart = 1;
-		int futureEnd = this.databaseSize>interval? interval+1 : this.databaseSize; // if database size less than 60 then futureEnd will point to the last element in the database
+		int futureEnd = interval; // if database size less than 60 then futureEnd will point to the last element in the database
 		int pastDataSize = 1;
 		int futureDataSize = interval;
 		// start from 1 as the trade 0 is added in the "past" hash table 
 		for(int i=0; i<this.databaseSize; i++)
 		{
+			System.out.println("Trade Num: "+ i);
 			TradeList trade = allTrades.get(i);
 			String key = generateKey(trade);
 			
@@ -108,7 +109,7 @@ public class GenerateHashMap {
 				if(innerMap.containsKey(traderId)) {
 					innerMap.put(traderId, innerMap.get(traderId) - tradeToRemove.getQty());
 					if(innerMap.get(traderId)<=0) {
-						System.out.println("Remove Trade traderID: "+traderId);
+//						System.out.println("Remove Trade traderID: "+traderId);
 						innerMap.remove(traderId);
 						if(innerMap.keySet().size()==0) {
 							this.past.remove(outerKey);
@@ -141,12 +142,66 @@ public class GenerateHashMap {
 				
 			}
 			
-//			System.out.println("---------------Past Data-----------------");
-//			System.out.println(this.past);
+			System.out.println("---------------Past Data-----------------");
+			System.out.println(this.past);
 			
 			// Add into futures HashTable
 			
+
+			//remove futureStart from the table and add futureEnd+1 to the table
+			if(futureStart < databaseSize) {
+				TradeList futureTradeToRemove = allTrades.get(futureStart);
+				String futureOuterKey = generateKey(futureTradeToRemove);
+				HashMap<Integer, Integer> FutureInnerMap = this.future.get(futureOuterKey);
+				int	traderId = futureTradeToRemove.getTrader().getTraderID();
+				System.out.println("Removing: trader "+traderId+" from future");
+				if(FutureInnerMap.containsKey(traderId)) {
+					FutureInnerMap.put(traderId, FutureInnerMap.get(traderId) - futureTradeToRemove.getQty());
+					if(FutureInnerMap.get(traderId)<=0) {
+						System.out.println("Remove Trade traderID: "+traderId);
+						FutureInnerMap.remove(traderId);
+						if(FutureInnerMap.keySet().size()==0) {
+							this.future.remove(futureOuterKey);
+						}
+					}
+				}
+				futureStart++;
 			
+			
+			
+			if(futureEnd < databaseSize-1) {
+				TradeList tradeToAdd = allTrades.get(futureEnd+1);
+				
+				futureOuterKey = generateKey(tradeToAdd);
+				
+				if(this.future.containsKey(futureOuterKey)) {
+					int innerKey = tradeToAdd.getTrader().getTraderID();
+					if(this.future.get(futureOuterKey).containsKey(innerKey)) {
+						
+						HashMap<Integer, Integer> inner = this.future.get(futureOuterKey);
+						int innerValue = inner.get(innerKey);
+						inner.put(innerKey, innerValue+tradeToAdd.getQty());
+					}
+					else {						
+						HashMap<Integer, Integer> temp = this.future.get(futureOuterKey);
+						temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+					}
+								
+				}
+				else {
+					HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
+					temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+					this.future.put(futureOuterKey, temp);
+				}
+				
+			}
+			else {
+				System.out.println("future End greater than size of database");
+			}
+			futureEnd++;
+			System.out.println("---------Future--------------");
+			System.out.println(this.future);
+		}
 		}
 
 	}
