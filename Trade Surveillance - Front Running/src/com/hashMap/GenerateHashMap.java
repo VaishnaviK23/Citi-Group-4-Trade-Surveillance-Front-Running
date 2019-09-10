@@ -205,7 +205,6 @@ public class GenerateHashMap {
 		}
 
 	}
-	
 	private void addIntoHashTable(HashMap<String, HashMap<Integer, Integer>> hashTable, TradeList tradeList) {
 		String key = generateKey(tradeList);
 		System.out.println(key);
