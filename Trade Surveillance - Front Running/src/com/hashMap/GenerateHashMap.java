@@ -1,6 +1,9 @@
 package com.hashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.dao.TradeListDAOImpl;
 import com.hashMap.ExtractTradeData;
 import com.pojo.TradeList;
@@ -15,8 +18,11 @@ public class GenerateHashMap {
 	int databaseSize;
 	//HashMap(TraderID , TradeIDList[])
 	HashMap<Integer,ArrayList<Integer>> trackFraudTrades = new HashMap<Integer,ArrayList<Integer>>();
+	ArrayList<Integer> fraudulentTransactions;
+	
 	
 	public GenerateHashMap() {
+			this.fraudulentTransactions = new ArrayList<Integer>();
 			this.trades = new ExtractTradeData().getDataFromDatabase();
 			//this.databaseSize = new TradeListDAOImpl().getRecordCount();
 			this.databaseSize = 8;
@@ -263,17 +269,40 @@ public class GenerateHashMap {
 		return false;
 	}
 	
-	
-	//Omkar's Code
-	static void findFRScenario(TradeList trade) {
-		
+	void findFRScenario(TradeList victim) {
+
+		String key1 = generateKey(victim);
+
+		if (victim.getTypeOfSecurity() == "Buy") {
+			String key2 = victim.getCompany() + ";Sell";
+
+			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
+			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
+			Integer findInFuture, pastSecurities;
+
+			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+
+			for (Entry pastTraderEntry : pastMapIterSet) {
+				findInFuture = (int) pastTraderEntry.getKey();
+
+				if (futureTraderMap.containsKey(findInFuture)) {
+					pastSecurities = (Integer) pastTraderEntry.getValue();
+					if ((Integer) futureTraderMap.get(findInFuture) - pastSecurities < (0.1 * pastSecurities)) {
+						this.fraudulentTransactions.add(findInFuture);
+					}
+
+				}
+			}
+		}
+
 	}
+	
 	
 	
 	public static void main(String[] args) {
 		GenerateHashMap obj = new GenerateHashMap();
 		obj.parseDatabase(obj.trades, obj.past, obj.future);
-		System.out.println(obj.trackFraudTrades);
+		System.out.println(obj.fraudulentTransactions);
 	}
 	
 }
