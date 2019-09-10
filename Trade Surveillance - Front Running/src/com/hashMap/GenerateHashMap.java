@@ -14,7 +14,7 @@ public class GenerateHashMap {
 	static int interval = 4;
 	int databaseSize;
 	//HashMap(TraderID , TradeIDList[])
-	HashMap<Integer,ArrayList<Integer>> TrackFraudTrades = new HashMap<Integer,ArrayList<Integer>>();
+	HashMap<Integer,ArrayList<Integer>> trackFraudTrades = new HashMap<Integer,ArrayList<Integer>>();
 	
 	public GenerateHashMap() {
 			this.trades = new ExtractTradeData().getDataFromDatabase();
@@ -22,29 +22,33 @@ public class GenerateHashMap {
 			this.databaseSize = 8;
 			System.out.println("Database Size: "+this.databaseSize);
 			//updating the future HashMap
-
+			
+			ArrayList<Integer> initialArray = new ArrayList<Integer>();
+			int firstTradeId = trades.get(0).getTradeID();
+			initialArray.add(firstTradeId);
+			trackFraudTrades.put(trades.get(0).getTrader().getTraderID(), initialArray);
 			for(int i=1;i<=interval;i++) {
 				//String key = trades.get(i).getCompany() + ";" + trades.get(i).getBuyOrSell();
 				//Add the incoming trade to HashMap
 				
 				//Lower Case Key
-				String key = (trades.get(i).getCompany() + ";" + trades.get(i).getBuyOrSell()).toLowerCase();
+				String key = generateKey(trades.get(i));
 				int traderid =trades.get(i).getTrader().getTraderID();
 				int traderQuant = trades.get(i).getQty();
 				int tradeid = trades.get(i).getTradeID();
 				
-				if(TrackFraudTrades.containsKey(traderid)) {
+				if(trackFraudTrades.containsKey(traderid)) {
 					
 					ArrayList<Integer> temp;
-					temp = TrackFraudTrades.get(traderid);
+					temp = trackFraudTrades.get(traderid);
 					temp.add(tradeid);
-					TrackFraudTrades.put(traderid, temp);
+					trackFraudTrades.put(traderid, temp);
 					
 				}else {
 					
 					ArrayList<Integer> temp = new ArrayList<>();
 					temp.add(tradeid);
-					TrackFraudTrades.put(traderid, temp);
+					trackFraudTrades.put(traderid, temp);
 				}
 				
 				if(future.containsKey(key)) {
@@ -170,7 +174,25 @@ public class GenerateHashMap {
 			
 			
 			if(futureEnd < databaseSize-1) {
+				//add trade Id to trackFraudeTrades
+				
+				
 				TradeList tradeToAdd = allTrades.get(futureEnd+1);
+				int traderIdToAdd = tradeToAdd.getTrader().getTraderID();
+				if(trackFraudTrades.containsKey(traderIdToAdd)) {
+					
+					ArrayList<Integer> listOfTradesMadeByTrader = trackFraudTrades.get(traderIdToAdd);
+					listOfTradesMadeByTrader.add(tradeToAdd.getTradeID());
+					trackFraudTrades.put(traderIdToAdd, listOfTradesMadeByTrader);
+				}
+				
+				else {
+					
+					ArrayList<Integer> listOfTradesMadeByTrader = new ArrayList<Integer>();
+					listOfTradesMadeByTrader.add(tradeToAdd.getTradeID());
+					trackFraudTrades.put(traderIdToAdd, listOfTradesMadeByTrader);
+					
+				}
 				
 				futureOuterKey = generateKey(tradeToAdd);
 				
@@ -241,6 +263,8 @@ public class GenerateHashMap {
 		return false;
 	}
 	
+	
+	//Omkar's Code
 	static void findFRScenario(TradeList trade) {
 		
 	}
@@ -249,7 +273,7 @@ public class GenerateHashMap {
 	public static void main(String[] args) {
 		GenerateHashMap obj = new GenerateHashMap();
 		obj.parseDatabase(obj.trades, obj.past, obj.future);
-		
+		System.out.println(obj.trackFraudTrades);
 	}
 	
 }
