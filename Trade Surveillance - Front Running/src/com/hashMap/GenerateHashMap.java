@@ -107,8 +107,34 @@ public class GenerateHashMap {
 		return false;
 	}
 	
-	static void findFRScenario(TradeList trade) {
-		
+	static void findFRScenario(TradeList victim) {
+
+		String key1 = victim.getCompany() + ";" + victim.getTypeOfSecurity();
+
+		if (victim.getTypeOfSecurity() == "Buy") {
+			String key2 = victim.getCompany() + ";Sell";
+
+			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
+			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
+			ArrayList<Integer> frTransactions = new ArrayList<Integer>();
+			Integer findInFuture, pastSecurities;
+
+			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+
+			for (Entry pastTraderEntry : pastMapIterSet) {
+				findInFuture = (int) pastTraderEntry.getKey();
+
+				if (futureTraderMap.containsKey(findInFuture)) {
+					pastSecurities = (Integer) pastTraderEntry.getValue();
+					if ((Integer) futureTraderMap.get(findInFuture) - pastSecurities < (0.1 * pastSecurities)) {
+						frTransactions.add(findInFuture);
+					}
+
+				}
+			}
+		}
+
+	}
 	}
 	
 	
