@@ -269,15 +269,18 @@ public class GenerateHashMap {
 		return false;
 	}
 	
+
 	void findFRScenario(TradeList victim) {
 
 		String key1 = generateKey(victim);
+
 
 		if (victim.getTypeOfSecurity() == "Buy") {
 			String key2 = victim.getCompany() + ";Sell";
 
 			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
 			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
+
 			Integer findInFuture, pastSecurities;
 
 			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
@@ -294,7 +297,6 @@ public class GenerateHashMap {
 				}
 			}
 		}
-
 	}
 	
 	
