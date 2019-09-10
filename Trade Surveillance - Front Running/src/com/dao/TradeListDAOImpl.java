@@ -175,6 +175,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 				recordCount += 1;
 			}
 			
+			connection.close();
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -188,11 +189,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 		return recordCount;
 	}
 	
-	
-	
-	
-	
-	
+
 	@Override
 	public void genTrades(int genTradeQuantity) {
 		// TODO Auto-generated method stub
@@ -260,25 +257,7 @@ public class TradeListDAOImpl implements TradeListDAO {
 	
 	}
 
-//	@Override
-//
-//	public int addTradeList(TradeList tradeList) {
-//		// TODO Auto-generated method stub
-//		return 0;
-//	}
-//
-//	@Override
-//	public TradeList findTradeListByID(int tradeListID) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public TradeList fetchBySr(int Sr, Connection conn) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-	
+
 	public int insertBetween(TradeList tradelist) {
 		int rows_inserted = 0;
 		try {

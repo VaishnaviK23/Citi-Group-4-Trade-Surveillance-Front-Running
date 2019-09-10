@@ -6,7 +6,7 @@ public class generateData {
 		// TODO Auto-generated method stub
 		TradeListDAOImpl obj = new TradeListDAOImpl();
 		
-		obj.genTrades(10);
+		obj.genTrades(100);
 	}
 
 }
