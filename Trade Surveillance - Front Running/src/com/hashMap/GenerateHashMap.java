@@ -1,4 +1,5 @@
 package com.hashMap;
+import com.hashMap.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -11,8 +12,8 @@ import com.pojo.TradeList;
 
 public class GenerateHashMap {
 
-	HashMap<String, HashMap<Integer, Integer>> past = new HashMap<String, HashMap<Integer, Integer>>(); 
-	HashMap<String, HashMap<Integer, Integer>> future = new HashMap<String, HashMap<Integer, Integer>>(); 
+	HashMap<String, HashMap<Integer, TradeInfo>> past = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
+	HashMap<String, HashMap<Integer, TradeInfo>> future = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
 	ArrayList<TradeList> trades = null;
 	static int interval = 4;
 	int databaseSize;
@@ -25,7 +26,7 @@ public class GenerateHashMap {
 			this.fraudulentTransactions = new ArrayList<Integer>();
 			this.trades = new ExtractTradeData().getDataFromDatabase();
 			//this.databaseSize = new TradeListDAOImpl().getRecordCount();
-			this.databaseSize = 8;
+			this.databaseSize = 8;	
 			System.out.println("Database Size: "+this.databaseSize);
 			//updating the future HashMap
 			
@@ -58,22 +59,30 @@ public class GenerateHashMap {
 				}
 				
 				if(future.containsKey(key)) {
-						
 						if(future.get(key).containsKey(traderid)) {
 							//update the inside hashmap
-							future.get(key).put(traderid, future.get(key).get(traderid) + traderQuant );
+							System.out.println("Aggrgating: "+ traderQuant);
+							TradeInfo tradeInfo = future.get(key).get(traderid);
+							tradeInfo.quantity += traderQuant;
+							tradeInfo.tradeNumberList.add(tradeid);
+							future.get(key).put(traderid, tradeInfo);
 							
 						}else {
-						
-							future.get(key).put(traderid,traderQuant);
+							ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+							listOfTrades.add(tradeid);
+							TradeInfo tradeInfo = new TradeInfo(traderQuant,listOfTrades);
+							future.get(key).put(traderid,tradeInfo);
 						
 						}
 						
 					}else {
 						
 						//traderValue.put(traderid, traderQuant)
-						HashMap<Integer, Integer> traderValue = new HashMap<Integer, Integer>();
-						traderValue.put(traderid, traderQuant);
+						HashMap<Integer, TradeInfo> traderValue = new HashMap<Integer, TradeInfo>();
+						ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+						listOfTrades.add(tradeid);
+						TradeInfo tradeInfo = new TradeInfo(traderQuant,listOfTrades);
+						traderValue.put(traderid, tradeInfo);
 						future.put(key , traderValue);
 					}
 					
@@ -81,7 +90,7 @@ public class GenerateHashMap {
 			System.out.println(this.future);
 	}
 	
-	public void parseDatabase(ArrayList<TradeList> allTrades, HashMap<String, HashMap<Integer,Integer>> past, HashMap<String, HashMap<Integer, Integer>> future) {
+	public void parseDatabase(ArrayList<TradeList> allTrades, HashMap<String, HashMap<Integer,TradeInfo>> past, HashMap<String, HashMap<Integer, TradeInfo>> future) {
 		
 		int current = 0;
 		int pastStart = 0;
@@ -93,12 +102,19 @@ public class GenerateHashMap {
 		// start from 1 as the trade 0 is added in the "past" hash table 
 		for(int i=0; i<this.databaseSize; i++)
 		{
-			System.out.println("Trade Num: "+ i);
+						
 			TradeList trade = allTrades.get(i);
+			System.out.println("Current Trade: "+ trade);
 			String key = generateKey(trade);
+			System.out.println("---------------Past Data-----------------");
+			System.out.println(this.past);
 			
-			if(isLargeTrade(trade)) {
-				findFRScenario(trade); // Omkar's stuff
+			System.out.println("---------------Future Data-----------------");
+			System.out.println(this.future);
+			
+			
+			if(i>=1 && isLargeTrade(trade)) {
+				//findFRScenario(trade); // Omkar's stuff
 			}
 			
 			//update HashTable
@@ -113,12 +129,16 @@ public class GenerateHashMap {
 				
 				TradeList tradeToRemove = allTrades.get(pastStart);
 				String outerKey = generateKey(tradeToRemove);
-				HashMap<Integer, Integer> innerMap = this.past.get(outerKey);
+				HashMap<Integer, TradeInfo> innerMap = this.past.get(outerKey);
 				int	traderId = tradeToRemove.getTrader().getTraderID();
 				
 				if(innerMap.containsKey(traderId)) {
-					innerMap.put(traderId, innerMap.get(traderId) - tradeToRemove.getQty());
-					if(innerMap.get(traderId)<=0) {
+					
+					TradeInfo tradeInfo = innerMap.get(traderId);
+					tradeInfo.quantity -= tradeToRemove.getQty();
+					tradeInfo.tradeNumberList.remove(tradeInfo.tradeNumberList.indexOf(tradeToRemove.getTradeID()));
+					innerMap.put(traderId, tradeInfo);
+					if(innerMap.get(traderId).getQuantity()<=0) {
 //						System.out.println("Remove Trade traderID: "+traderId);
 						innerMap.remove(traderId);
 						if(innerMap.keySet().size()==0) {
@@ -134,133 +154,167 @@ public class GenerateHashMap {
 					int innerKey = tradeToAdd.getTrader().getTraderID();
 					if(this.past.get(outerKey).containsKey(innerKey)) {
 						
-						HashMap<Integer, Integer> inner = this.past.get(outerKey);
-						int innerValue = inner.get(innerKey);
-						inner.put(innerKey, innerValue+tradeToAdd.getQty());
+						HashMap<Integer, TradeInfo> inner = this.past.get(outerKey);
+						TradeInfo tradeInfo = inner.get(innerKey);
+						tradeInfo.quantity+=tradeToAdd.getQty();
+						tradeInfo.tradeNumberList.add(tradeToAdd.getTradeID());
+						inner.put(innerKey, tradeInfo);
+						
 					}
 					else {						
-						HashMap<Integer, Integer> temp = this.past.get(outerKey);
-						temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+						HashMap<Integer, TradeInfo> temp = this.past.get(outerKey);
+						
+						ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+						listOfTrades.add(tradeToAdd.getTradeID());
+						TradeInfo tradeInfo = new TradeInfo(tradeToAdd.getQty(), listOfTrades);
+						
+						temp.put(tradeToAdd.getTrader().getTraderID(), tradeInfo);
 					}
 								
 				}
 				else {
-					HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
-					temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+					HashMap<Integer, TradeInfo> temp = new HashMap<Integer, TradeInfo>();
+					ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+					listOfTrades.add(tradeToAdd.getTradeID());
+					TradeInfo tradeInfo = new TradeInfo(tradeToAdd.getQty(), listOfTrades);
+					temp.put(tradeToAdd.getTrader().getTraderID(), tradeInfo);
 					this.past.put(outerKey, temp);
 				}
 				
 			}
 			
-			System.out.println("---------------Past Data-----------------");
-			System.out.println(this.past);
-			
-			// Add into futures HashTable
 			
 
-			//remove futureStart from the table and add futureEnd+1 to the table
-			if(futureStart < databaseSize) {
+			//remove pastStart from the table and add current to the table
+			if(futureStart < databaseSize)
+			{
 				TradeList futureTradeToRemove = allTrades.get(futureStart);
-				String futureOuterKey = generateKey(futureTradeToRemove);
-				HashMap<Integer, Integer> FutureInnerMap = this.future.get(futureOuterKey);
+				String outerKey = generateKey(futureTradeToRemove );
+				HashMap<Integer, TradeInfo> futureInnerMap = this.future.get(outerKey);
 				int	traderId = futureTradeToRemove.getTrader().getTraderID();
-				System.out.println("Removing: trader "+traderId+" from future");
-				if(FutureInnerMap.containsKey(traderId)) {
-					FutureInnerMap.put(traderId, FutureInnerMap.get(traderId) - futureTradeToRemove.getQty());
-					if(FutureInnerMap.get(traderId)<=0) {
-						System.out.println("Remove Trade traderID: "+traderId);
-						FutureInnerMap.remove(traderId);
-						if(FutureInnerMap.keySet().size()==0) {
-							this.future.remove(futureOuterKey);
+				
+				if(futureInnerMap.containsKey(traderId)) {
+					
+					TradeInfo tradeInfo = futureInnerMap.get(traderId);
+					tradeInfo.quantity -= futureTradeToRemove.getQty();
+					tradeInfo.tradeNumberList.remove(tradeInfo.tradeNumberList.indexOf(futureTradeToRemove.getTradeID()));
+					futureInnerMap.put(traderId, tradeInfo);
+					if(futureInnerMap.get(traderId).getQuantity()<=0) {
+//						System.out.println("Remove Trade traderID: "+traderId);
+						futureInnerMap.remove(traderId);
+						if(futureInnerMap.keySet().size()==0) {
+							this.future.remove(outerKey);
 						}
 					}
 				}
-				futureStart++;
 			
+			futureStart++;	
 			
-			
-			if(futureEnd < databaseSize-1) {
-				//add trade Id to trackFraudeTrades
-				
-				
+			if(futureEnd < databaseSize - 1) {
 				TradeList tradeToAdd = allTrades.get(futureEnd+1);
-				int traderIdToAdd = tradeToAdd.getTrader().getTraderID();
-				if(trackFraudTrades.containsKey(traderIdToAdd)) {
-					
-					ArrayList<Integer> listOfTradesMadeByTrader = trackFraudTrades.get(traderIdToAdd);
-					listOfTradesMadeByTrader.add(tradeToAdd.getTradeID());
-					trackFraudTrades.put(traderIdToAdd, listOfTradesMadeByTrader);
-				}
-				
-				else {
-					
-					ArrayList<Integer> listOfTradesMadeByTrader = new ArrayList<Integer>();
-					listOfTradesMadeByTrader.add(tradeToAdd.getTradeID());
-					trackFraudTrades.put(traderIdToAdd, listOfTradesMadeByTrader);
-					
-				}
-				
-				futureOuterKey = generateKey(tradeToAdd);
+			
+				String futureOuterKey = generateKey(tradeToAdd);
 				
 				if(this.future.containsKey(futureOuterKey)) {
 					int innerKey = tradeToAdd.getTrader().getTraderID();
 					if(this.future.get(futureOuterKey).containsKey(innerKey)) {
 						
-						HashMap<Integer, Integer> inner = this.future.get(futureOuterKey);
-						int innerValue = inner.get(innerKey);
-						inner.put(innerKey, innerValue+tradeToAdd.getQty());
+						HashMap<Integer, TradeInfo> inner = this.future.get(futureOuterKey);
+						TradeInfo tradeInfo = inner.get(innerKey);
+						tradeInfo.quantity+=tradeToAdd.getQty();
+						tradeInfo.tradeNumberList.add(tradeToAdd.getTradeID());
+						inner.put(innerKey, tradeInfo);
+						
 					}
 					else {						
-						HashMap<Integer, Integer> temp = this.future.get(futureOuterKey);
-						temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+						HashMap<Integer, TradeInfo> temp = this.future.get(futureOuterKey);
+						
+						ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+						listOfTrades.add(tradeToAdd.getTradeID());
+						TradeInfo tradeInfo = new TradeInfo(tradeToAdd.getQty(), listOfTrades);
+						
+						temp.put(tradeToAdd.getTrader().getTraderID(), tradeInfo);
 					}
 								
 				}
 				else {
-					HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
-					temp.put(tradeToAdd.getTrader().getTraderID(), tradeToAdd.getQty());
+					HashMap<Integer, TradeInfo> temp = new HashMap<Integer, TradeInfo>();
+					ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+					listOfTrades.add(tradeToAdd.getTradeID());
+					TradeInfo tradeInfo = new TradeInfo(tradeToAdd.getQty(), listOfTrades);
+					temp.put(tradeToAdd.getTrader().getTraderID(), tradeInfo);
 					this.future.put(futureOuterKey, temp);
 				}
-				
+
 			}
+						
 			else {
 				System.out.println("future End greater than size of database");
 			}
+			
 			futureEnd++;
-			System.out.println("---------Future--------------");
-			System.out.println(this.future);
-		}
+			
+			}
+			
+			
+			
+//			System.out.println("Past Data--------------------------------");
+//			System.out.println(this.past);
+//			
+
+			// Add into futures HashTable
+			
+
+			//remove futureStart from the table and add futureEnd+1 to the table
+
 		}
 
 	}
-	private void addIntoHashTable(HashMap<String, HashMap<Integer, Integer>> hashTable, TradeList tradeList) {
+	private void addIntoHashTable(HashMap<String, HashMap<Integer, TradeInfo>> hashTable, TradeList tradeList) {
 		String key = generateKey(tradeList);
 		System.out.println(key);
 		if(hashTable.containsKey(key))
 		{
-			HashMap<Integer, Integer> temp = hashTable.get(key); //get inner Hash Table
+			HashMap<Integer, TradeInfo> temp = hashTable.get(key); //get inner Hash Table
 			int innerKey = tradeList.getTrader().getTraderID();
-			System.out.println(temp.size());
 			if(temp.containsKey(tradeList.getTrader().getTraderID())) { //if trader exists
-				temp.put(innerKey, temp.get(innerKey)+tradeList.getQty());
+				
+				TradeInfo tradeInfo = temp.get(innerKey);
+				ArrayList<Integer> listOfTrades = tradeInfo.getTradeNumberList();
+				tradeInfo.quantity += tradeList.getQty();
+				listOfTrades.add(tradeList.getTradeID());
+				temp.put(innerKey, tradeInfo);
 			}
 			else { // if not found
-				temp.put(innerKey, tradeList.getQty());
+				
+				ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+				listOfTrades.add(tradeList.getTradeID());
+				
+				TradeInfo tradeInfo = new TradeInfo(tradeList.getQty(), listOfTrades);
+
+				temp.put(innerKey, tradeInfo);
 			}			
 		}
 		else {
-			HashMap<Integer, Integer> innerMap = new HashMap<Integer, Integer>();
-			innerMap.put(tradeList.getTrader().getTraderID(), tradeList.getQty());
+			HashMap<Integer, TradeInfo> innerMap = new HashMap<Integer, TradeInfo>();
+			
+			ArrayList<Integer> listOfTrades = new ArrayList<Integer>();
+			listOfTrades.add(tradeList.getTradeID());
+			
+			TradeInfo tradeInfo = new TradeInfo(tradeList.getQty(), listOfTrades);
+			
+			
+			innerMap.put(tradeList.getTrader().getTraderID(), tradeInfo);
 			hashTable.put(key, innerMap);
 		}
 
 
 	}
 
-	
+//	
 	private String generateKey(TradeList tradeList) {
 		// TODO Auto-generated method stub
-		return (tradeList.getCompany() + ";" + tradeList.getBuyOrSell() ).toLowerCase();
+		return (tradeList.getCompany() + ";" + tradeList.getBuyOrSell()+";"+tradeList.getTypeOfSecurity() ).toLowerCase();
 	}
 
 	static boolean isLargeTrade(TradeList trade) {
@@ -269,42 +323,106 @@ public class GenerateHashMap {
 		return false;
 	}
 	
-
-	void findFRScenario(TradeList victim) {
-
-		String key1 = generateKey(victim);
-
-
-		if (victim.getTypeOfSecurity() == "Buy") {
-			String key2 = victim.getCompany() + ";Sell";
-
-			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
-			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
-
-			Integer findInFuture, pastSecurities;
-
-			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
-
-			for (Entry pastTraderEntry : pastMapIterSet) {
-				findInFuture = (int) pastTraderEntry.getKey();
-
-				if (futureTraderMap.containsKey(findInFuture)) {
-					pastSecurities = (Integer) pastTraderEntry.getValue();
-					if ((Integer) futureTraderMap.get(findInFuture) - pastSecurities < (0.1 * pastSecurities)) {
-						this.fraudulentTransactions.add(findInFuture);
-					}
-
-				}
-			}
-		}
-	}
-	
-	
+//
+//	void findFRScenario(TradeList victim) {
+//
+//		String key1 = generateKey(victim);
+//
+////		detect bbs sss
+//		if (victim.getBuyOrSell().equals("Buy") && (victim.getTypeOfSecurity().equals("Shares"))) {
+//			String key2 = (victim.getCompany() + ";Sell" + ";Shares").toLowerCase();
+//
+//			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
+//			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
+//
+//			Integer findInFuture, pastSecurities;
+//
+//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+//
+//			for (Entry pastTraderEntry : pastMapIterSet) {
+//				findInFuture = (int) pastTraderEntry.getKey();
+//
+//				if (futureTraderMap.containsKey(findInFuture)) {
+//					pastSecurities = (Integer) pastTraderEntry.getValue();
+//					if (((Integer) futureTraderMap.get(findInFuture) < (1.1 * pastSecurities)) || ((Integer) futureTraderMap.get(findInFuture) > (0.9 * pastSecurities))) {
+//						this.fraudulentTransactions.add(findInFuture);
+//					}
+//				}
+//			}
+//		}
+//		//detect bbs fff
+//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Futures"))) {
+//			String key2 = (victim.getCompany() + ";Sell" +";Futures").toLowerCase();
+//
+//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
+//
+//			Integer findInPast, pastSecurities;
+//
+//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+//
+//			for (Entry pastTraderEntry : pastMapIterSet) {
+//				findInPast = (int) pastTraderEntry.getKey();
+//
+//				if (pastTraderMap.containsKey(findInPast)) {
+//					pastSecurities = (Integer) pastTraderEntry.getValue();
+//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
+//						this.fraudulentTransactions.add(findInPast);
+//					}
+//
+//				}
+//			}
+//		}
+//		//detect bbs sfs
+//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Futures"))) {
+//			String key2 = (victim.getCompany() + ";Sell" +";Shares").toLowerCase();
+//
+//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
+//
+//			Integer findInPast, pastSecurities;
+//
+//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+//
+//			for (Entry pastTraderEntry : pastMapIterSet) {
+//				findInPast = (int) pastTraderEntry.getKey();
+//
+//				if (pastTraderMap.containsKey(findInPast)) {
+//					pastSecurities = (Integer) pastTraderEntry.getValue();
+//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
+//						this.fraudulentTransactions.add(findInPast);
+//					}
+//
+//				}
+//			}
+//		}
+//		//detect bbs fsf
+//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Shares"))) {
+//			String key2 = (victim.getCompany() + ";Sell" +";Futures").toLowerCase();
+//
+//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
+//
+//			Integer findInPast, pastSecurities;
+//
+//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
+//
+//			for (Entry pastTraderEntry : pastMapIterSet) {
+//				findInPast = (int) pastTraderEntry.getKey();
+//
+//				if (pastTraderMap.containsKey(findInPast)) {
+//					pastSecurities = (Integer) pastTraderEntry.getValue();
+//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
+//						this.fraudulentTransactions.add(findInPast);
+//					}
+//
+//				}
+//			}
+//		}
+//	}
+//	
+//	
 	
 	public static void main(String[] args) {
 		GenerateHashMap obj = new GenerateHashMap();
 		obj.parseDatabase(obj.trades, obj.past, obj.future);
-		System.out.println(obj.fraudulentTransactions);
 	}
 	
 }
