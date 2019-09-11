@@ -11,11 +11,12 @@ import com.pojo.TradeList;
 //import com.dao.*;
 
 public class GenerateHashMap {
-
+	
+	ArrayList<ResultObject> result; 
 	HashMap<String, HashMap<Integer, TradeInfo>> past = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
 	HashMap<String, HashMap<Integer, TradeInfo>> future = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
 	ArrayList<TradeList> trades = null;
-	static int interval = 4;
+	static int interval = 60;
 	int databaseSize;
 	//HashMap(TraderID , TradeIDList[])
 	HashMap<Integer,ArrayList<Integer>> trackFraudTrades = new HashMap<Integer,ArrayList<Integer>>();
@@ -25,8 +26,8 @@ public class GenerateHashMap {
 	public GenerateHashMap() {
 			this.fraudulentTransactions = new ArrayList<Integer>();
 			this.trades = new ExtractTradeData().getDataFromDatabase();
-			//this.databaseSize = new TradeListDAOImpl().getRecordCount();
-			this.databaseSize = 8;	
+			this.databaseSize = new TradeListDAOImpl().getRecordCount();
+			//this.databaseSize = 8;	
 			System.out.println("Database Size: "+this.databaseSize);
 			//updating the future HashMap
 			
@@ -87,10 +88,10 @@ public class GenerateHashMap {
 					}
 					
 			}
-			System.out.println(this.future);
+//			System.out.println(this.future);
 	}
 	
-	public void parseDatabase(ArrayList<TradeList> allTrades, HashMap<String, HashMap<Integer,TradeInfo>> past, HashMap<String, HashMap<Integer, TradeInfo>> future) {
+	public ArrayList<ResultObject> parseDatabase(ArrayList<TradeList> allTrades, HashMap<String, HashMap<Integer,TradeInfo>> past, HashMap<String, HashMap<Integer, TradeInfo>> future) {
 		
 		int current = 0;
 		int pastStart = 0;
@@ -104,17 +105,17 @@ public class GenerateHashMap {
 		{
 						
 			TradeList trade = allTrades.get(i);
-			System.out.println("Current Trade: "+ trade);
+//			System.out.println("Current Trade: "+ trade);
 			String key = generateKey(trade);
-			System.out.println("---------------Past Data-----------------");
-			System.out.println(this.past);
-			
-			System.out.println("---------------Future Data-----------------");
-			System.out.println(this.future);
-			
+//			System.out.println("---------------Past Data-----------------");
+//			System.out.println(this.past);
+//			
+//			System.out.println("---------------Future Data-----------------");
+//			System.out.println(this.future);
+//			
 			
 			if(i>=1 && isLargeTrade(trade)) {
-				//findFRScenario(trade); // Omkar's stuff
+				findFRScenario(trade); 
 			}
 			
 			//update HashTable
@@ -268,7 +269,7 @@ public class GenerateHashMap {
 			//remove futureStart from the table and add futureEnd+1 to the table
 
 		}
-
+		return this.result;
 	}
 	private void addIntoHashTable(HashMap<String, HashMap<Integer, TradeInfo>> hashTable, TradeList tradeList) {
 		String key = generateKey(tradeList);
@@ -323,8 +324,7 @@ public class GenerateHashMap {
 		return false;
 	}
 	
-//
-void findFRScenario(TradeList victim) {
+	void findFRScenario(TradeList victim) {
 		//System.out.println("Victim Trade: "+victim);
 		String key1 = generateKey(victim);
 		System.out.println(victim.getBuyOrSell());
@@ -349,10 +349,12 @@ void findFRScenario(TradeList victim) {
 						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
 							// fraud trade detected
 //							this.fraudulentTransactions.add(findInFuture);
+							
 							System.out.println("Current Trade: "+ victim);
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 1));
 						}
 
 					}
@@ -386,6 +388,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 2));
 						}
 
 					}
@@ -420,6 +423,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 3));
 						}
 
 					}
@@ -454,6 +458,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 4));
 						}
 
 					}
@@ -462,39 +467,6 @@ void findFRScenario(TradeList victim) {
 			
 		}
 
-		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
-			
-			//System.out.println("Victim is buy");
-			String key3 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
-			String key2 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
-			//System.out.println(key2);
-			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
-			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
-			if (pastTraderMap != null && futureTraderMap != null) {
-				Integer findInFuture, pastSecurities;
-
-				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
-
-				for (Entry pastTraderEntry : pastMapIterSet) {
-					findInFuture = (int) pastTraderEntry.getKey();
-
-					if (futureTraderMap.containsKey(findInFuture)) {
-						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
-						pastSecurities = temp.getQuantity();
-						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
-							// fraud trade detected
-//							this.fraudulentTransactions.add(findInFuture);
-							System.out.println("Current Trade: "+ victim);
-							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
-							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
-							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
-						}
-
-					}
-				}
-			}
-			
-		}
 		
 		// sb sp
 		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
@@ -514,6 +486,7 @@ void findFRScenario(TradeList victim) {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+					result.add(new ResultObject(victim, null , tradeInfo, 5));
 				}
 			}
 			
@@ -537,6 +510,7 @@ void findFRScenario(TradeList victim) {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+					result.add(new ResultObject(victim, null , tradeInfo, 6));
 				}
 			}
 		}
@@ -559,6 +533,7 @@ void findFRScenario(TradeList victim) {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+					result.add(new ResultObject(victim, null , tradeInfo, 7));
 				}
 			}
 		}
@@ -581,6 +556,7 @@ void findFRScenario(TradeList victim) {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+					result.add(new ResultObject(victim, null , tradeInfo, 8));
 				}
 			}
 		}
@@ -612,6 +588,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 9 ));
 						}
 
 					}
@@ -648,6 +625,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 10 ));
 						}
 
 					}
@@ -655,7 +633,7 @@ void findFRScenario(TradeList victim) {
 			}
 		}
 		
-		//ss fsf
+		//ssb fsf
 		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
 			
 			//System.out.println("Victim is buy");
@@ -682,6 +660,7 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 11 ));
 						}
 
 					}
@@ -716,46 +695,14 @@ void findFRScenario(TradeList victim) {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 12 ));
 						}
 
 					}
 				}
 			}
 		}
-		//ssb fsf
-		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
 			
-			//System.out.println("Victim is buy");
-			String key3 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
-			String key2 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
-			System.out.println(key2);
-			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
-			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
-			if (pastTraderMap != null && futureTraderMap != null) {
-				Integer findInFuture, pastSecurities;
-
-				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
-
-				for (Entry pastTraderEntry : pastMapIterSet) {
-					findInFuture = (int) pastTraderEntry.getKey();
-
-					if (futureTraderMap.containsKey(findInFuture)) {
-						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
-						pastSecurities = temp.getQuantity();
-						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
-							// fraud trade detected
-//							this.fraudulentTransactions.add(findInFuture);
-							System.out.println("Current Trade: "+ victim);
-							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
-							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
-							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
-						}
-
-					}
-				}
-			}
-		}
-		
 		// bs sp
 		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
 			
@@ -772,7 +719,7 @@ void findFRScenario(TradeList victim) {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					
+					result.add(new ResultObject(victim, null, tradeInfo, 13) );
 				}
 			}
 			
@@ -794,7 +741,7 @@ void findFRScenario(TradeList victim) {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					
+					result.add(new ResultObject(victim, null, tradeInfo, 14) );
 				}
 			}
 		}
@@ -815,7 +762,7 @@ void findFRScenario(TradeList victim) {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					
+					result.add(new ResultObject(victim, null , tradeInfo, 15) );
 				}
 			}
 		}
@@ -835,18 +782,18 @@ void findFRScenario(TradeList victim) {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					
+					result.add(new ResultObject(victim, null, tradeInfo, 16) );
 				}
 			}
 			
 		}
-	
+
 	}	
 	
 	public static void main(String[] args) {
 		GenerateHashMap obj = new GenerateHashMap();
-		obj.parseDatabase(obj.trades, obj.past, obj.future);
-		//System.out.println(obj.fraudulentTransactions);
+		ArrayList<ResultObject> result =  obj.parseDatabase(obj.trades, obj.past, obj.future);
+		System.out.println(result);
 	}
 	
 }
