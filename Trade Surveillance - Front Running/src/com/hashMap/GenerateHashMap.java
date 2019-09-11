@@ -12,7 +12,7 @@ import com.pojo.TradeList;
 
 public class GenerateHashMap {
 	
-	ArrayList<ResultObject> result; 
+	ArrayList<ResultObject> result = new ArrayList<ResultObject>(); 
 	HashMap<String, HashMap<Integer, TradeInfo>> past = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
 	HashMap<String, HashMap<Integer, TradeInfo>> future = new HashMap<String, HashMap<Integer, TradeInfo>>(); 
 	ArrayList<TradeList> trades = null;
@@ -28,7 +28,7 @@ public class GenerateHashMap {
 			this.trades = new ExtractTradeData().getDataFromDatabase();
 			this.databaseSize = new TradeListDAOImpl().getRecordCount();
 			//this.databaseSize = 8;	
-			System.out.println("Database Size: "+this.databaseSize);
+			//System.out.println("Database Size: "+this.databaseSize);
 			//updating the future HashMap
 			
 			ArrayList<Integer> initialArray = new ArrayList<Integer>();
@@ -62,7 +62,7 @@ public class GenerateHashMap {
 				if(future.containsKey(key)) {
 						if(future.get(key).containsKey(traderid)) {
 							//update the inside hashmap
-							System.out.println("Aggrgating: "+ traderQuant);
+							//System.out.println("Aggrgating: "+ traderQuant);
 							TradeInfo tradeInfo = future.get(key).get(traderid);
 							tradeInfo.quantity += traderQuant;
 							tradeInfo.tradeNumberList.add(tradeid);
@@ -105,7 +105,7 @@ public class GenerateHashMap {
 		{
 						
 			TradeList trade = allTrades.get(i);
-//			System.out.println("Current Trade: "+ trade);
+			System.out.println("Current Trade: "+ trade);
 			String key = generateKey(trade);
 //			System.out.println("---------------Past Data-----------------");
 //			System.out.println(this.past);
@@ -248,10 +248,6 @@ public class GenerateHashMap {
 				}
 
 			}
-						
-			else {
-				System.out.println("future End greater than size of database");
-			}
 			
 			futureEnd++;
 			
@@ -319,15 +315,15 @@ public class GenerateHashMap {
 	}
 
 	static boolean isLargeTrade(TradeList trade) {
+		
 		if(trade.getQty() >= 20000)
 			return true;
 		return false;
 	}
 	
 	void findFRScenario(TradeList victim) {
-		//System.out.println("Victim Trade: "+victim);
 		String key1 = generateKey(victim);
-		System.out.println(victim.getBuyOrSell());
+		//System.out.println(victim.getBuyOrSell());
 		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
 			
 			//System.out.println("Victim is buy");
@@ -486,7 +482,7 @@ public class GenerateHashMap {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
-					result.add(new ResultObject(victim, null , tradeInfo, 5));
+					result.add(new ResultObject(victim, new TradeInfo() , tradeInfo, 5));
 				}
 			}
 			
@@ -510,7 +506,7 @@ public class GenerateHashMap {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
-					result.add(new ResultObject(victim, null , tradeInfo, 6));
+					result.add(new ResultObject(victim, new TradeInfo() , tradeInfo, 6));
 				}
 			}
 		}
@@ -533,7 +529,7 @@ public class GenerateHashMap {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
-					result.add(new ResultObject(victim, null , tradeInfo, 7));
+					result.add(new ResultObject(victim, new TradeInfo() , tradeInfo, 7));
 				}
 			}
 		}
@@ -556,7 +552,7 @@ public class GenerateHashMap {
 					System.out.println("Current Trade: "+ victim);
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
-					result.add(new ResultObject(victim, null , tradeInfo, 8));
+					result.add(new ResultObject(victim, new TradeInfo() , tradeInfo, 8));
 				}
 			}
 		}
@@ -588,7 +584,9 @@ public class GenerateHashMap {
 							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
 							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
-							result.add(new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 9 ));
+							ResultObject r = new ResultObject(victim, tradeInfo , futureTraderMap.get(findInFuture), 9 );
+							System.out.println(r);
+							this.result.add(r);
 						}
 
 					}
@@ -719,7 +717,7 @@ public class GenerateHashMap {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					result.add(new ResultObject(victim, null, tradeInfo, 13) );
+					result.add(new ResultObject(victim, new TradeInfo(), tradeInfo, 13) );
 				}
 			}
 			
@@ -741,7 +739,7 @@ public class GenerateHashMap {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					result.add(new ResultObject(victim, null, tradeInfo, 14) );
+					result.add(new ResultObject(victim, new TradeInfo(), tradeInfo, 14) );
 				}
 			}
 		}
@@ -762,7 +760,7 @@ public class GenerateHashMap {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					result.add(new ResultObject(victim, null , tradeInfo, 15) );
+					result.add(new ResultObject(victim, new TradeInfo() , tradeInfo, 15) );
 				}
 			}
 		}
@@ -782,7 +780,7 @@ public class GenerateHashMap {
 					findInFuture = (int) pastTraderEntry.getKey();
 					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
 					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
-					result.add(new ResultObject(victim, null, tradeInfo, 16) );
+					result.add(new ResultObject(victim, new TradeInfo(), tradeInfo, 16) );
 				}
 			}
 			
