@@ -21,7 +21,7 @@ public class ExtractTradeData {
 		TradeListDAOImpl obj = new TradeListDAOImpl();
 		Connection connection = obj.openConnection();
 		
-		String query = "select * from tradelist2";
+		String query = "select * from tradelist";
 		
 		int recordCount = 0;
 		ArrayList<TradeList> tradeData = new ArrayList<TradeList>();
