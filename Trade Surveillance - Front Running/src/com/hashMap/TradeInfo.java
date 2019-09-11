@@ -4,8 +4,18 @@ import java.util.ArrayList;
 
 public class TradeInfo {
 	
+	
 	int quantity;
 	ArrayList<Integer> tradeNumberList;
+	
+	
+
+	public TradeInfo() {
+		this.quantity = 0;
+		this.tradeNumberList = new ArrayList<Integer>();
+	}
+	
+	
 	public TradeInfo(int quantity, ArrayList<Integer> tradeNumberList) {
 		this.quantity = quantity;
 		this.tradeNumberList = tradeNumberList;
@@ -26,6 +36,4 @@ public class TradeInfo {
 	public String toString() {
 		return "TradeInfo [quantity=" + quantity + ", tradeNumberList=" + tradeNumberList + "]";
 	}
-
-	
 }
