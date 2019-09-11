@@ -324,105 +324,529 @@ public class GenerateHashMap {
 	}
 	
 //
-//	void findFRScenario(TradeList victim) {
-//
-//		String key1 = generateKey(victim);
-//
-////		detect bbs sss
-//		if (victim.getBuyOrSell().equals("Buy") && (victim.getTypeOfSecurity().equals("Shares"))) {
-//			String key2 = (victim.getCompany() + ";Sell" + ";Shares").toLowerCase();
-//
-//			HashMap<Integer, Integer> pastTraderMap = past.get(key1);
-//			HashMap<Integer, Integer> futureTraderMap = future.get(key2);
-//
-//			Integer findInFuture, pastSecurities;
-//
-//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
-//
-//			for (Entry pastTraderEntry : pastMapIterSet) {
-//				findInFuture = (int) pastTraderEntry.getKey();
-//
-//				if (futureTraderMap.containsKey(findInFuture)) {
-//					pastSecurities = (Integer) pastTraderEntry.getValue();
-//					if (((Integer) futureTraderMap.get(findInFuture) < (1.1 * pastSecurities)) || ((Integer) futureTraderMap.get(findInFuture) > (0.9 * pastSecurities))) {
-//						this.fraudulentTransactions.add(findInFuture);
-//					}
-//				}
-//			}
-//		}
-//		//detect bbs fff
-//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Futures"))) {
-//			String key2 = (victim.getCompany() + ";Sell" +";Futures").toLowerCase();
-//
-//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
-//
-//			Integer findInPast, pastSecurities;
-//
-//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
-//
-//			for (Entry pastTraderEntry : pastMapIterSet) {
-//				findInPast = (int) pastTraderEntry.getKey();
-//
-//				if (pastTraderMap.containsKey(findInPast)) {
-//					pastSecurities = (Integer) pastTraderEntry.getValue();
-//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
-//						this.fraudulentTransactions.add(findInPast);
-//					}
-//
-//				}
-//			}
-//		}
-//		//detect bbs sfs
-//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Futures"))) {
-//			String key2 = (victim.getCompany() + ";Sell" +";Shares").toLowerCase();
-//
-//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
-//
-//			Integer findInPast, pastSecurities;
-//
-//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
-//
-//			for (Entry pastTraderEntry : pastMapIterSet) {
-//				findInPast = (int) pastTraderEntry.getKey();
-//
-//				if (pastTraderMap.containsKey(findInPast)) {
-//					pastSecurities = (Integer) pastTraderEntry.getValue();
-//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
-//						this.fraudulentTransactions.add(findInPast);
-//					}
-//
-//				}
-//			}
-//		}
-//		//detect bbs fsf
-//		if (victim.getTypeOfSecurity().equals("Buy") && (victim.getTypeOfSecurity().equals("Shares"))) {
-//			String key2 = (victim.getCompany() + ";Sell" +";Futures").toLowerCase();
-//
-//			HashMap<Integer, Integer> pastTraderMap = past.get(key2);
-//
-//			Integer findInPast, pastSecurities;
-//
-//			Set<Entry<Integer, Integer>> pastMapIterSet = pastTraderMap.entrySet();
-//
-//			for (Entry pastTraderEntry : pastMapIterSet) {
-//				findInPast = (int) pastTraderEntry.getKey();
-//
-//				if (pastTraderMap.containsKey(findInPast)) {
-//					pastSecurities = (Integer) pastTraderEntry.getValue();
-//					if ((Integer) pastTraderMap.get(findInPast) - pastSecurities < (0.1 * pastSecurities)) {
-//						this.fraudulentTransactions.add(findInPast);
-//					}
-//
-//				}
-//			}
-//		}
-//	}
-//	
-//	
+void findFRScenario(TradeList victim) {
+		//System.out.println("Victim Trade: "+victim);
+		String key1 = generateKey(victim);
+		System.out.println(victim.getBuyOrSell());
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key2 = (victim.getCompany() + ";Sell" + ";Shares").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key1);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+		}
+
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key2 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key1);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+		}
+		
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
+			String key2 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+				
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+		}
+		
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Shares").toLowerCase();
+			String key2 = (victim.getCompany() + ";Sell" + ";Shares").toLowerCase();
+			System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+		}
+
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
+			String key2 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() <= (1.1 * pastSecurities) && futureTraderMap.get(findInFuture).getQuantity() >= (0.9 * pastSecurities)) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+		}
+		
+		// sb sp
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Put Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					//this.fraudulentTransactions.add(findInFuture);
+					System.out.println("Current Trade: "+ victim);
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+				}
+			}
+			
+		}
+		
+		// sb fp
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Put Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					//this.fraudulentTransactions.add(findInFuture);
+					System.out.println("Current Trade: "+ victim);
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+				}
+			}
+		}
+		
+		// bb sc
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Call Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					//this.fraudulentTransactions.add(findInFuture);
+					System.out.println("Current Trade: "+ victim);
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+				}
+			}
+		}
+		
+		// bb fc
+		if (victim.getBuyOrSell().equals("Buy") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Call Option").toLowerCase();
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					//this.fraudulentTransactions.add(findInFuture);
+					System.out.println("Current Trade: "+ victim);
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());			
+				}
+			}
+		}
+		
+		//current trade - sell scenarios
+		// ssb sss
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key2 = (victim.getCompany() + ";Buy" + ";Shares").toLowerCase();
+			System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key1);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+			
+
+		}
+		
+		
+		//ssb fff
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key2 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
+			System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key1);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+		}
+		
+		//ss fsf
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
+			String key2 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+		}
+		
+		//ssb sfs
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Shares").toLowerCase();
+			String key2 = (victim.getCompany() + ";Buy" + ";Shares").toLowerCase();
+			System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+		}
+		//ssb fsf
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Futures").toLowerCase();
+			String key2 = (victim.getCompany() + ";Buy" + ";Futures").toLowerCase();
+			System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			HashMap<Integer, TradeInfo> futureTraderMap = future.get(key2);
+			if (pastTraderMap != null && futureTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+
+					if (futureTraderMap.containsKey(findInFuture)) {
+						TradeInfo temp = (TradeInfo) pastTraderEntry.getValue();
+						pastSecurities = temp.getQuantity();
+						if (futureTraderMap.get(findInFuture).getQuantity() >= pastSecurities) {
+							// fraud trade detected
+//							this.fraudulentTransactions.add(findInFuture);
+							System.out.println("Current Trade: "+ victim);
+							TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+							System.out.println("Suspicious Trade/s: "+ tradeInfo.getTradeNumberList());
+							System.out.println("Front running detected at: "+ futureTraderMap.get(findInFuture).getTradeNumberList());
+						}
+
+					}
+				}
+			}
+		}
+		
+		// bs sp
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Put Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
+					
+				}
+			}
+			
+		}
+		
+		// bs fp
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Buy" + ";Put Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
+					
+				}
+			}
+		}
+		
+		// ss sc
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Shares")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Call Option").toLowerCase();
+			//System.out.println(key2);
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
+					
+				}
+			}
+		}
+		
+		// ss fc
+		if (victim.getBuyOrSell().equals("Sell") && victim.getTypeOfSecurity().equals("Futures")) {
+			
+			//System.out.println("Victim is buy");
+			String key3 = (victim.getCompany() + ";Sell" + ";Call Option").toLowerCase();
+			HashMap<Integer, TradeInfo> pastTraderMap = past.get(key3);
+			if (pastTraderMap != null) {
+				Integer findInFuture, pastSecurities;
+
+				Set<Entry<Integer, TradeInfo>> pastMapIterSet = pastTraderMap.entrySet();
+
+				for (Entry pastTraderEntry : pastMapIterSet) {
+					findInFuture = (int) pastTraderEntry.getKey();
+					TradeInfo tradeInfo = (TradeInfo)pastTraderEntry.getValue();
+					System.out.println("Front Running Detected: "+ tradeInfo.getTradeNumberList());
+					
+				}
+			}
+			
+		}
+	
+	}	
 	
 	public static void main(String[] args) {
 		GenerateHashMap obj = new GenerateHashMap();
 		obj.parseDatabase(obj.trades, obj.past, obj.future);
+		//System.out.println(obj.fraudulentTransactions);
 	}
 	
 }
