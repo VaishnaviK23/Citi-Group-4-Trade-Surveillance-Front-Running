@@ -10,8 +10,8 @@ public class ResultObject {
 	private TradeList currentTrade;
 	private TradeInfo suspiciousTrades;
 	private TradeInfo frontRunningTrades;
-	private ArrayList<TradeList> listOfSuspiciousTrades;
-	private ArrayList<TradeList> listOfFrontRunningTrades;
+	private ArrayList<TradeList> listOfSuspiciousTrades = new ArrayList<TradeList>();
+	private ArrayList<TradeList> listOfFrontRunningTrades = new ArrayList<TradeList>();
 	private int scenarioNumber;
 	
 	
@@ -56,7 +56,9 @@ public class ResultObject {
 		this.suspiciousTrades = suspiciousTrades;
 		this.frontRunningTrades = frontRunningTrades;
 		this.setListOfSuspiciousTrades(this.listOfSuspiciousTrades);
+		System.out.println("Done");
 		this.setListOfFrontRunningTrades(this.listOfFrontRunningTrades);
+		System.out.println("Done");
 	}
 
 	public int getScenarioNumber() {
