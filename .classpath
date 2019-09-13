@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Trade Surveillance - Front Running/src"/>
+<<<<<<< HEAD
+	<classpathentry kind="lib" path="/MyProducts/WebContent/WEB-INF/lib/ojdbc6.jar"/>
+=======
+	<classpathentry kind="lib" path="/JSPDemos/WebContent/WEB-INF/lib/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="E:/jar/com.fasterxml.jackson.core.jar"/>
+	<classpathentry kind="lib" path="E:/jar/com.fasterxml.jackson.databind.jar"/>
+	<classpathentry kind="lib" path="E:/jar/jackson-annotations-2.1.2.jar"/>
+	<classpathentry kind="lib" path="E:/jar/javax.ws.rs-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="E:/jar/javax.json-1.0.jar"/>
+	<classpathentry kind="lib" path="E:/jar/json-simple-1.1.jar"/>
+>>>>>>> 3d658e2f2cde05a95b69ecdbe1a673a8eab87845
+	<classpathentry kind="output" path="Trade Surveillance - Front Running/bin"/>
+</classpath>
